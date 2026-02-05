@@ -74,7 +74,7 @@ impl Config {
     }
 
     pub fn socket_url(&self) -> String {
-        format!("wss://{}/device-socket/websocket", self.host)
+        format!("wss://{}/device-socket/websocket?vsn=2.0.0", self.host)
     }
 
     pub fn heartbeat_interval_secs(&self) -> u64 {
@@ -121,7 +121,7 @@ product = "my-product"
         assert_eq!(config.host, "devices.nerves-hub.org");
         assert_eq!(
             config.socket_url(),
-            "wss://devices.nerves-hub.org/device-socket/websocket"
+            "wss://devices.nerves-hub.org/device-socket/websocket?vsn=2.0.0"
         );
         assert!(matches!(config.auth, AuthConfig::Mtls { .. }));
         assert_eq!(config.firmware.uuid, "aaaa-bbbb");
@@ -148,7 +148,7 @@ product = "my-product"
         let config = Config::from_str(toml).unwrap();
         assert_eq!(
             config.socket_url(),
-            "wss://devices.nerves-hub.org/device-socket/websocket"
+            "wss://devices.nerves-hub.org/device-socket/websocket?vsn=2.0.0"
         );
         assert!(matches!(config.auth, AuthConfig::SharedSecret { .. }));
     }

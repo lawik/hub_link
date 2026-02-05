@@ -57,6 +57,7 @@ impl NervesHubClient {
         Ok(Self { config, serial })
     }
 
+    #[allow(dead_code)]
     pub fn serial(&self) -> &str {
         &self.serial
     }
@@ -84,7 +85,8 @@ impl NervesHubClient {
 
         let (mut write, mut read) = ws_stream.split();
 
-        let topic = format!("device:{}", self.serial);
+        // Server's DeviceJSONSerializer rewrites "device" <-> "device:{id}" internally
+        let topic = "device".to_string();
         let channel = ChannelBuilder::new(topic.clone());
 
         // Send join
@@ -193,21 +195,24 @@ impl NervesHubClient {
             }
             AuthConfig::SharedSecret { key, secret } => {
                 let auth = SharedSecretAuth::new(key.clone(), secret.clone());
-                let headers = auth
+                let auth_headers = auth
                     .auth_headers(&self.serial)
                     .map_err(|e| ClientError::Auth(e.to_string()))?;
 
-                let mut request = http::Request::builder()
-                    .uri(&url)
-                    .header("Host", &self.config.host);
-
-                for (name, value) in &headers {
-                    request = request.header(name, value);
-                }
-
-                let request = request
-                    .body(())
+                // Build a proper WebSocket request first, then add auth headers
+                use tungstenite::client::IntoClientRequest;
+                let mut request = url
+                    .into_client_request()
                     .map_err(|e| ClientError::Connection(e.to_string()))?;
+
+                for (name, value) in &auth_headers {
+                    request.headers_mut().insert(
+                        http::header::HeaderName::from_bytes(name.as_bytes())
+                            .map_err(|e| ClientError::Connection(e.to_string()))?,
+                        http::header::HeaderValue::from_str(value)
+                            .map_err(|e| ClientError::Connection(e.to_string()))?,
+                    );
+                }
 
                 let (ws_stream, _response) =
                     tokio_tungstenite::connect_async(request)
