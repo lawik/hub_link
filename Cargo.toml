@@ -1,0 +1,31 @@
+[package]
+name = "hub_link"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+tokio-tungstenite = { version = "0.24", features = ["rustls-tls-native-roots"] }
+tungstenite = "0.24"
+rustls = "0.23"
+rustls-pemfile = "2"
+webpki-roots = "0.26"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+reqwest = { version = "0.12", features = ["rustls-tls", "stream"] }
+hmac = "0.12"
+sha2 = "0.10"
+pbkdf2 = { version = "0.12", features = ["simple"] }
+base64 = "0.22"
+toml = "0.8"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+thiserror = "2"
+url = "2"
+futures-util = "0.3"
+tokio-rustls = "0.26"
+rand = "0.8"
+
+[dev-dependencies]
+tempfile = "3"
+tokio-tungstenite = { version = "0.24", features = ["rustls-tls-native-roots"] }
