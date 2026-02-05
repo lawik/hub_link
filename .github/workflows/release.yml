@@ -28,6 +28,8 @@ jobs:
         with:
           key: ${{ matrix.target }}
       - uses: mlugg/setup-zig@v1
+        with:
+          version: 0.14.0
       - run: cargo install cargo-zigbuild
       - run: cargo zigbuild --release --target ${{ matrix.target }}
       - run: cp target/${{ matrix.target }}/release/hub_link ${{ matrix.artifact }}
